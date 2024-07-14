@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 
+import 'package:get/get.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -13,14 +15,14 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final TextEditingController topTextController = TextEditingController();
   final TextEditingController bottomTextController = TextEditingController();
-  String memeUrl = '';
-  String memeName = "10-Guy";
+  RxString memeUrl = ''.obs;
+ RxString memeName = "10-Guy".obs;
 
   void generateMeme() {
-    setState(() {
-      memeUrl =
-          'https://apimeme.com/meme?meme=$memeName&top=${Uri.encodeComponent(topTextController.text)}&bottom=${Uri.encodeComponent(bottomTextController.text)}';
-    });
+  
+      memeUrl.value =
+          'https://apimeme.com/meme?meme=${memeName.value}&top=${Uri.encodeComponent(topTextController.text)}&bottom=${Uri.encodeComponent(bottomTextController.text)}';
+ 
   }
 
   final List<String> memeOptions = [
@@ -77,6 +79,10 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    print(
+      "rebuild"
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Meme Gen App'),
@@ -104,21 +110,26 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               SizedBox(height: 20),
-              DropdownButton<String>(
-                value: memeName,
-                underline: Container(),
-                hint: Text('Select a meme'),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    memeName = newValue ?? memeName;
-                  });
-                },
-                items: memeOptions.map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
+              Obx(
+                 () {
+                  return DropdownButton<String>(
+                    value: memeName.value,
+                    underline: Container(),
+                    hint: Text('Select a meme'),
+                    onChanged: (String? newValue) {
+                     
+                        memeName.value = newValue ?? memeName.value;
+                       
+                   
+                    },
+                    items: memeOptions.map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
                   );
-                }).toList(),
+                }
               ),
               SizedBox(height: 20),
               ElevatedButton(
@@ -126,11 +137,16 @@ class _HomePageState extends State<HomePage> {
                 child: Text('Generate Meme'),
               ),
               SizedBox(height: 20),
-              if (memeUrl.isNotEmpty)
-                Image.network(
-                  memeUrl,
-                  key: ValueKey(memeUrl),
-                  height: 200,
+              
+                Obx(
+                  () {if (memeUrl.isNotEmpty)
+                    return Image.network(
+                      memeUrl.value,
+                      key: ValueKey(memeUrl),
+                      height: 200,
+                    );
+                    else return Container();
+                  }
                 ),
             ],
           ),
