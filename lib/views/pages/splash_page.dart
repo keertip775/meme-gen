@@ -15,11 +15,11 @@ class _SplashPageState extends State<SplashPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    Future.delayed(Duration(seconds: 3), () {
+    Future.delayed(Duration(seconds: 4), () {
       Get.off(HomePage());
-      
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
